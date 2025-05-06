@@ -41,9 +41,9 @@ export default async function PostPage({
   const postImageUrl = post?.mainImage?.asset?.url || null;
 
   return (
-    <main className="container mx-auto min-h-screen max-w-3xl p-8 flex flex-col gap-4">
+    <main className="main-container">
       <div>
-        <Link href="/blog" className="hover:underline">
+        <Link href="/blog" className="back-link">
           ← Back to posts
         </Link>
       </div>
@@ -52,15 +52,15 @@ export default async function PostPage({
         <Image
           src={postImageUrl}
           alt={post.title || "Post image"}
-          className="aspect-video rounded-xl object-cover"
+          className="post-image"
           width={550}
           height={310}
         />
       ) : (
-        <p className="text-red-500">Image not available</p>
+        <p className="image-fallback">Image not available</p>
       )}
 
-      <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
+      <h1 className="post-title">{post.title}</h1>
 
       <div className="prose">
         <p>Published: {new Date(post.publishedAt).toLocaleDateString()}</p>
