@@ -23,10 +23,10 @@ const options = { next: { revalidate: 30 } };
 export default async function PostPage({
   params,
 }: {
-  params: { slug: string }; // Type definition for params
+  params: Promise<{ slug: string }>; // Expecting params to be a Promise
 }) {
-  // `params` is already an object, but we will ensure to handle it correctly.
-  const { slug } = params;
+  const resolvedParams = await params; // Resolve the Promise to get { slug }
+  const { slug } = resolvedParams;
 
   const post = await client.fetch<SanityDocument>(POST_QUERY, { slug }, options);
 
@@ -70,28 +70,14 @@ export default async function PostPage({
   );
 }
 
-// Static Params Generation for SSR
-export async function generateStaticParams() {
-  const posts = await client.fetch<{ slug: { current: string } }[]>(
-    `*[_type == "post"]{ slug }`
-  );
-
-  return posts.map((post) => ({
-    params: { slug: post.slug.current },
-  }));
-}
-
-// Metadata generation
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const post = await client.fetch<SanityDocument>(POST_QUERY, {
-    slug: params.slug,
-  });
-
-  return {
-    title: post?.title || "Post",
+// Optional: Pre-generate paths for static site generation
+type SlugType = {
+  slug: {
+    current: string;
   };
+};
+
+export async function generateStaticParams() {
+  const posts = await client.fetch<SlugType[]>(`*[_type == "post"]{ slug }`);
+  return posts.map((post) => ({ slug: post.slug.current }));
 }
